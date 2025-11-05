@@ -1,0 +1,16 @@
+- base_info:
+    api_name: 登录系统
+    url: /user/login
+    method: POST
+    header:
+      Content-Type: application/x-www-form-urlencoded
+    auth: false
+  test_cases:
+    - case_name: 登录系统
+      data:
+        username: "apitest"
+        password: "apitest"
+      validation:
+        - contains: { 'data': 'X-Token' }
+      extract:
+        token: $.data.X-Token

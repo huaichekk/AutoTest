@@ -1,0 +1,1 @@
+{"uuid": "bed5eb88-3ef3-4728-b471-9c38055b1f73", "children": ["c3ad023b-7500-4593-a049-491e5221e1d9"], "befores": [{"name": "conftest", "status": "passed", "start": 1762339872926, "stop": 1762339872926}], "afters": [{"name": "conftest::0", "status": "passed", "start": 1762339873012, "stop": 1762339873012}], "start": 1762339872926, "stop": 1762339873012}

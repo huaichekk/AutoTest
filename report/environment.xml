@@ -1,0 +1,22 @@
+<environment>
+    <parameter>
+        <key>测试环境</key>
+        <value>测试服</value>
+    </parameter>
+    <parameter>
+        <key>接口地址</key>
+        <value>127.0.0.1:8080</value>
+    </parameter>
+    <parameter>
+        <key>数据库版本</key>
+        <value>MySQL 8.0</value>
+    </parameter>
+    <parameter>
+        <key>测试人员</key>
+        <value>怀澈</value>
+    </parameter>
+    <parameter>
+        <key>allure版本</key>
+        <value>allure-2.13.8</value>
+    </parameter>
+</environment>

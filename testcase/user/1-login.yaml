@@ -1,0 +1,102 @@
+- base_info:
+    api_name: 用户登录
+    url: /user/login
+    method: POST
+  test_cases:
+    # 一、正向测试（正常场景）
+    - case_name: 正向测试-正常登录-成功
+      data:
+        username: "testapi"
+        password: "testapi"
+      validation:
+        - contains: { 'message': "success" }
+        - contains: { 'data': "X-Token" }  # 校验Token存在（非空）
+
+    # 二、反向测试（参数合法性校验）
+    - case_name: 反向测试-用户名为空-失败
+      data:
+        username: ""  # 空值
+        password: "testapi123"
+      validation:
+        - contains: { 'message': "用户名长度必须为6-12位" }
+        - eq: { 'code': 400 }
+
+    - case_name: 反向测试-用户名超长（13位）-失败
+      data:
+        username: "testapi1234567"  # 13位（超出12位上限）
+        password: "testapi123"
+      validation:
+        - contains: { 'message': "用户名长度必须为6-12位" }
+        - eq: { 'code': 400 }
+
+    - case_name: 反向测试-用户名含特殊字符（@）-失败
+      data:
+        username: "test@api"  # 含@（非法字符）
+        password: "testapi123"
+      validation:
+        - contains: { 'message': "用户名只能包含字母、数字、下划线" }
+        - eq: { 'code': 400 }
+
+    - case_name: 反向测试-密码为空-失败
+      data:
+        username: "testapi123"
+        password: ""  # 空值
+      validation:
+        - contains: { 'message': "密码长度必须为6-12位" }
+        - eq: { 'code': 400 }
+
+    - case_name: 反向测试-密码超短（5位）-失败
+      data:
+        username: "testapi123"
+        password: "test1"  # 5位（低于6位下限）
+      validation:
+        - contains: { 'message': "密码长度必须为6-12位" }
+        - eq: { 'code': 400 }
+
+    - case_name: 反向测试-密码含特殊字符（#）-失败
+      data:
+        username: "testapi123"
+        password: "test#123"  # 含#（非法字符）
+      validation:
+        - contains: { 'message': "密码只能包含字母、数字、下划线" }
+        - eq: { 'code': 400 }
+
+    # 三、反向测试（业务逻辑校验）
+    - case_name: 反向测试-密码错误-失败
+      data:
+        username: "testapi"  # 存在的用户
+        password: "testapi456"  # 错误密码（与正确密码仅末尾不同）
+      validation:
+        - contains: { 'message': "用户名或密码错误" }
+        - eq: { 'code': 400 }
+
+    - case_name: 反向测试-不存在的用户-失败
+      data:
+        username: "test667788"  # 系统中无此用户
+        password: "testapi123"
+      validation:
+        - contains: { 'message': "用户名或密码错误" }  # 统一提示（防枚举）
+        - eq: { 'code': 400 }
+
+    - case_name: 反向测试-用户名大小写差异-失败
+      data:
+        username: "TestApi123"  # 与存在用户（testapi123）大小写不同
+        password: "test123api"  # 正确密码
+      validation:
+        - contains: { 'message': "用户名或密码错误" }
+        - eq: { 'code': 400 }
+
+    # 四、反向测试（异常场景）
+    - case_name: 反向测试-参数缺失（无用户名）-失败
+      data:
+        password: "testapi123"  # 仅传密码，不传用户名
+      validation:
+        - contains: { 'message': "用户名长度必须为6-12位" }  # 空值等效校验
+        - eq: { 'code': 400 }
+
+    - case_name: 反向测试-参数缺失（无密码）-失败
+      data:
+        username: "testapi123"  # 仅传用户名，不传密码
+      validation:
+        - contains: { 'message': "密码长度必须为6-12位" }  # 空值等效校验
+        - eq: { 'code': 400 }

@@ -1,0 +1,109 @@
+- base_info:
+    api_name: 修改用户信息接口
+    url: /user/update
+    method: PUT
+  test_cases:
+    # 一、正向测试（成功场景）
+    - case_name: 正向测试-仅修改用户名（符合规则）-成功
+      data:
+        old_password: "apitest"  # 正确的原密码
+        new_username: "apitest1"  # 6-12位，仅字母/数字/下划线
+        new_password: ""            # 不修改密码（空值）
+      validation:
+        - eq: { "code": 200 }
+        - contains: { "message": "用户信息修改成功" }
+
+    - case_name: 正向测试-仅修改密码（符合规则）-成功
+      data:
+        old_password: "apitest"
+        new_username: ""            # 不修改用户名（空值）
+        new_password: "apitest1"  # 6-12位，仅字母/数字/下划线
+      validation:
+        - eq: { "code": 200 }
+        - contains: { "message": "用户信息修改成功" }
+
+    - case_name: 正向测试-同时修改用户名和密码-成功
+      data:
+        old_password: "apitest1"
+        new_username: "apitest"
+        new_password: "apitest"
+      validation:
+        - eq: { "code": 200 }
+        - contains: { "message": "用户信息修改成功" }
+
+
+    # 二、反向测试（参数校验失败）
+    - case_name: 反向测试-原密码为空-失败
+      data:
+        old_password: ""
+        new_username: "newuser123"
+      validation:
+        - eq: { "code": 400 }
+        - contains: { "message": "原密码不能为空" }
+
+    - case_name: 反向测试-新用户名长度不足（5位）-失败
+      data:
+        old_password: "apitest"
+        new_username: "test1"
+      validation:
+        - eq: { "code": 400 }
+        - contains: { "message": "新用户名长度必须为6-12位" }
+
+    - case_name: 反向测试-新用户名超长（13位）-失败
+      data:
+        old_password: "apitest"
+        new_username: "toolongusername"  # 13位（超过12位上限）
+      validation:
+        - eq: { "code": 400 }
+        - contains: { "message": "新用户名长度必须为6-12位" }
+
+    - case_name: 反向测试-新用户名含特殊字符（@）-失败
+      data:
+        old_password: "apitest"
+        new_username: "user@name"    # 包含@（非法字符）
+      validation:
+        - eq: { "code": 400 }
+        - contains: { "message": "新用户名只能包含字母、数字、下划线" }
+
+    - case_name: 反向测试-新密码纯特殊字符-失败
+      data:
+        old_password: "apitest"
+        new_password: "!@#$%^"       # 全为特殊字符（非法）
+      validation:
+        - eq: { "code": 400 }
+        - contains: { "message": "新密码只能包含字母、数字、下划线" }
+
+    - case_name: 反向测试-新密码长度超短（5位）-失败
+      data:
+        old_password: "apitest"
+        new_password: "short"
+      validation:
+        - eq: { "code": 400 }
+        - contains: { "message": "新密码长度必须为6-12位" }
+
+
+    # 三、反向测试（业务逻辑失败）
+    - case_name: 反向测试-原密码错误-失败
+      data:
+        old_password: "wrongoldpass"  # 原密码错误
+        new_username: "newuser123"
+      validation:
+        - eq: { "code": 400 }
+        - contains: { "message": "原密码错误，无法修改信息" }
+
+    - case_name: 反向测试-新用户名已被其他用户占用-失败
+      data:
+        old_password: "apitest"
+        new_username: "admin1"
+      validation:
+        - eq: { "code": 400 }
+        - contains: { "message": "新用户名已被占用" }
+
+    - case_name: 反向测试-新用户名与原用户名相同-失败（可选，根据业务是否允许）
+      data:
+        old_password: "apitest"
+        new_username: "apitest"   # 与当前登录用户的原用户名一致
+      validation:
+        - eq: { "code": 400 }
+        - contains: { "message": "新用户名与原用户名一致，无需修改" }  # 若接口未处理，可补充此逻辑
+
